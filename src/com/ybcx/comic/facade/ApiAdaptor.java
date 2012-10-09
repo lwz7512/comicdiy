@@ -5,18 +5,23 @@ package com.ybcx.comic.facade;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.fileupload.FileItem;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.fileupload.FileItem;
+
 import com.ybcx.comic.beans.Assets;
+import com.ybcx.comic.beans.Cart;
 import com.ybcx.comic.beans.Cartoon;
 import com.ybcx.comic.beans.Category;
+import com.ybcx.comic.beans.Friend;
+import com.ybcx.comic.beans.Images;
 import com.ybcx.comic.beans.Label;
+import com.ybcx.comic.beans.UserDetail;
 
 
 
@@ -45,11 +50,9 @@ public class ApiAdaptor {
 		this.comicService.saveImagePath(filePath);
 	}
 
-	public String getAllAssets() {
-		List<Assets> list = comicService.getAllAssets();
-		JSONArray jsonArray = JSONArray.fromCollection(list);
-		processPath(jsonArray);
-		return jsonArray.toString();
+	public int getAllAssetsCount() {
+		int result = comicService.getAllAssetsCount();
+		return result;
 	}
 
 	//处理返回值
@@ -60,7 +63,7 @@ public class ApiAdaptor {
 			if(!"".equals(assetPath)){
 				//先从字符串中找到文件夹uploadFile的位置，再加上uploadFile的长度10，即可截取到下属文件路径
 				int position = assetPath.lastIndexOf("uploadFile");
-				String relativePath = assetPath.substring(position+10);
+				String relativePath = assetPath.substring(position+11);
 				jsonArray.getJSONObject(i).set("path", relativePath);
 			}
 			//缩略图路径
@@ -68,11 +71,21 @@ public class ApiAdaptor {
 			if(!"".equals(thumbnailPath)){
 				//先从字符串中找到文件夹uploadFile的位置，再加上uploadFile的长度10，即可截取到下属文件路径
 				int position = thumbnailPath.lastIndexOf("uploadFile");
-				String relativePath = thumbnailPath.substring(position+10);
+				String relativePath = thumbnailPath.substring(position+11);
+				
 				jsonArray.getJSONObject(i).set("thumbnail", relativePath);
 			}
 		}
 	}
+	
+	public String getAssetsByPage(String pageNum) {
+		List<Assets> list = comicService.getAssetsByPage(Integer.parseInt(pageNum));
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processPath(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	
 		
 	public String createAsset(String name, String type, String price,
 			String category, String label, String holiday, String assetPath,
@@ -90,13 +103,39 @@ public class ApiAdaptor {
 		return result;
 	}
 	
-	public String updateAssetById(String assetId, String name, String price, String holiday) {
-		String result = comicService.updateAssetById(assetId,name,price,holiday);
+	public String updateAssetById(String assetId, String name, String price, String holiday, String type, String labelIds) {
+		String result = comicService.updateAssetById(assetId,name,price,holiday,type,labelIds);
 		return result;
 	}
 	
-	public String searchByLabel(String labels) {
-		List<Assets> list = comicService.searchByLabel(labels);
+	public int searchByLabel(String labels) {
+		int result = comicService.searchByLabel(labels);
+		return result;
+	}
+	
+	public String searchByLabelPage(String labels, String pageNum) {
+		List<Assets> list = comicService.searchByLabelPage(labels,pageNum);
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processPath(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	public int searchByLabelAndType(String labels, String type) {
+		int result = comicService.searchByLabelAndType(labels,type);
+		return result;
+	}
+	
+	public String searchByLabelAndTypePage(String labels, String type,
+			String pageNum) {
+		List<Assets> list = comicService.searchByLabelAndTypePage(labels,type,pageNum);
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processPath(jsonArray);
+		return jsonArray.toString();
+	}
+
+	
+	public String getByCategoryAndType(String categorys, String type, String pageNum) {
+		List<Assets> list = comicService.getByCategoryAndType(categorys,type,pageNum);
 		JSONArray jsonArray = JSONArray.fromCollection(list);
 		processPath(jsonArray);
 		return jsonArray.toString();
@@ -107,8 +146,8 @@ public class ApiAdaptor {
 		return JSONArray.fromCollection(list).toString();
 	}
 	
-	public String createCategory(String name) {
-		String idVal = comicService.createCategory(name);
+	public String createCategory(String name, String parent) {
+		String idVal = comicService.createCategory(name,parent);
 		return idVal;
 	}
 	
@@ -166,7 +205,7 @@ public class ApiAdaptor {
 		if(!"".equals(thumbnailPath)){
 			//先从字符串中找到文件夹uploadFile的位置，再加上uploadFile的长度10，即可截取到下属文件路径
 			int position = thumbnailPath.lastIndexOf("uploadFile");
-			String relativePath = thumbnailPath.substring(position+10);
+			String relativePath = thumbnailPath.substring(position+11);
 			jsonObject.set("thumbnail", relativePath);
 		}
 	}
@@ -186,7 +225,7 @@ public class ApiAdaptor {
 			if(!"".equals(thumbnailPath)){
 				//先从字符串中找到文件夹uploadFile的位置，再加上uploadFile的长度10，即可截取到下属文件路径
 				int position = thumbnailPath.lastIndexOf("uploadFile");
-				String relativePath = thumbnailPath.substring(position+10);
+				String relativePath = thumbnailPath.substring(position+11);
 				jsonArray.getJSONObject(i).set("thumbnail", relativePath);
 			}
 		}
@@ -194,6 +233,7 @@ public class ApiAdaptor {
 	
 	
 	public String createLocalImage(List<FileItem> fileItems) {
+		String result="";
 		FileItem imgData = null;
 		String userId = "";
 		for (int i = 0; i < fileItems.size(); i++) {
@@ -210,7 +250,17 @@ public class ApiAdaptor {
 			}
 		}
 		String imgPath = comicService.createLocalImage(userId,imgData);
-		return imgPath;
+		
+		//处理全路径，返回相对路径即可
+		if(imgPath.contains("uploadFile")){
+			//先从字符串中找到文件夹uploadFile的位置，再加上uploadFile的长度10，即可截取到下属文件路径
+			int position = imgPath.lastIndexOf("uploadFile");
+			result =  imgPath.substring(position+11);
+		}else{
+			result = imgPath;
+		}
+		
+		return result;
 	}
 	
 	public String createAnimation(List<FileItem> fileItems) {
@@ -241,7 +291,11 @@ public class ApiAdaptor {
 				}
 				
 				if (item.getFieldName().equals("content")) {
-					content = item.getString();
+					try {
+						content = item.getString("UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
 				}
 				
 			}
@@ -253,7 +307,146 @@ public class ApiAdaptor {
 		
 	}
 	
+	public String modifyAnim(String animId, String content) {
+		String result = comicService.modifyAnimation(animId,content);
+		return result;
+	}
 	
-
+	public int getAssetCountByType(String type, String category) {
+		int result = comicService.getAssetCountByType(type,category);
+		return result;
+	}
+	
+	public String getAllAnim() {
+		List<Cartoon> list = comicService.getAllAnimation();
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processCartoon(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	private void processImgPath(JSONArray jsonArray) {
+		for (int i = 0; i < jsonArray.length(); i++) {
+			//DIY成品的缩略图
+			String thumbnailPath = jsonArray.getJSONObject(i).get("path").toString();
+			if(!"".equals(thumbnailPath)){
+				//先从字符串中找到文件夹uploadFile的位置，再加上uploadFile的长度10，即可截取到下属文件路径
+				int position = thumbnailPath.lastIndexOf("uploadFile");
+				String relativePath = thumbnailPath.substring(position+11);
+				jsonArray.getJSONObject(i).set("path", relativePath);
+			}
+		}
+	}
+	
+	public String getAllImage() {
+		List<Images> list = comicService.getAllImages();
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processImgPath(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	public String examineAnim(String animId) {
+		String result = comicService.examineAnim(animId);
+		return result;
+	}
+	
+	public String examineImage(String imgId, String imgPath) {
+		String result = comicService.examineImage(imgId,imgPath);
+		return result;
+	}
+	
+	public String getAnimByPage(String pageNum) {
+		List<Cartoon> list = comicService.getAmimByPage(pageNum);
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processCartoon(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	public int getAnimCount() {
+		int result = comicService.getAnimCount();
+		return result;
+	}
+	
+	public String getImageByPage(String pageNum) {
+		List<Images> list = comicService.getImageByPage(pageNum);
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processImgPath(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	public int getImageCount() {
+		int result = comicService.getImageCount();
+		return result;
+	}
+	
+	public int searchAnim(String keys) {
+		int result= comicService.searchAnimation(keys);
+		return result;
+	}
+	
+	public String searchAnimByPage(String keys, String pageNum) {
+		List<Cartoon> list = comicService.searchAnimationByPage(keys,pageNum);
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processCartoon(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	public String operateWeiboUser(String userId, String accessToken) {
+		String result = comicService.operateWeiboUser(userId,accessToken);
+		return result;
+	}
+	
+	public String getUserInfo(String userId) {
+		UserDetail detail= comicService.getUserInfo(userId);
+		return JSONArray.fromObject(detail).toString();
+	}
+	
+	public String forwardToWeibo(String userId, String animId, String content) {
+		String result = comicService.forwardToWeibo(userId,animId,content);
+		return result;
+	}
+	
+	public String getFriendByPage(String userId, String page) {
+		List<Friend> resList = comicService.getFriendByPage(userId,page);
+		return JSONArray.fromCollection(resList).toString();
+	}
+	
+	// TODO 开始购物车
+	public String addAssetToCart(String userId, String assetId) {
+		String result = comicService.addAssetToCart(userId,assetId);
+		return result;
+	}
+	
+	public String deleteAssetFromCart(String userId, String assetId) {
+		String result = comicService.deleteAssetFromCart(userId,assetId);
+		return result;
+	}
+	
+	public int getAssetState(String userId, String assetId) {
+		int result = comicService.getAssetState(userId,assetId);
+		return result;
+	}
+	
+	public String getStateByAssetIds(String userId, String assetIds) {
+		Map<String,Integer> resMap = comicService.getStateByAssetIds(userId,assetIds);
+		return JSONObject.fromObject(resMap).toString();
+	}
+	
+	public String changeAssetState(String userId, String assetId) {
+		String result = comicService.changeAssetState(userId,assetId);
+		return result;
+	}
+	
+	public String getUserCartState(String userId) {
+		List<Cart> list = comicService.getUserCartState(userId);
+		JSONArray jsonArray = JSONArray.fromCollection(list);
+		processCartoon(jsonArray);
+		return jsonArray.toString();
+	}
+	
+	public String changeUserCartState(String userId, String totalPrice) {
+		String result = comicService.changeAssetState(userId,Integer.parseInt(totalPrice));
+		return result;
+	}
+	
 
 } // end of class

@@ -1,7 +1,5 @@
 package com.ybcx.comic.beans;
 
-import org.apache.commons.fileupload.FileItem;
-
 public class Assets {
 
 	private String id;
@@ -10,21 +8,13 @@ public class Assets {
 	private float price;
 	private String category;
 	private String label;
+	private String labelIds;
 	private String holiday;
 	private String path;
 	private String thumbnail;
 	private String uploadTime;
 	private int heat;
 	private int enable;
-	
-	private FileItem sourceData;
-	
-	public FileItem getSourceData() {
-		return sourceData;
-	}
-	public void setSourceData(FileItem sourceData) {
-		this.sourceData = sourceData;
-	}
 	
 	public String getId() {
 		return id;
@@ -55,6 +45,12 @@ public class Assets {
 	}
 	public String getLabel() {
 		return label;
+	}
+	public String getLabelIds() {
+		return labelIds;
+	}
+	public void setLabelIds(String labelIds) {
+		this.labelIds = labelIds;
 	}
 	public void setLabel(String label) {
 		this.label = label;

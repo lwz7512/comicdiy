@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+
 /**
  * 真正处理客户端传参到服务端的逻辑，与适配器打交道，适配器再与服务打交道；
  * 
@@ -94,11 +95,13 @@ public class AppStarter extends HttpServlet implements ApplicationListener,
 
 		
 		//微博接入有关api
-		if(action.equals(AppStarter.GETACCESSTOKENBYCODE) 
-				||(action.equals(AppStarter.FORWARDTOWEIBO)) 
-				||(action.equals(AppStarter.IMPROVEWEIBOUSER))){
+		if(action.equals(AppStarter.OPERATEWEIBOUSER) 
+				||(action.equals(AppStarter.GETUSERINFO))
+				||(action.equals(AppStarter.FORWARDTOWEIBO))
+				||(action.equals(AppStarter.GETFRIENDBYPAGE))) {
 			
 			weiboProcess(action,req,res);
+			return;
 		}
 		
 		
@@ -126,13 +129,47 @@ public class AppStarter extends HttpServlet implements ApplicationListener,
 	 */
 	private void weiboProcess(String action, HttpServletRequest req,
 			HttpServletResponse res) throws IOException {
-		
-		if(action.equals(AppStarter.GETACCESSTOKENBYCODE)){
+		//TODO 现在做这里
+		if(action.equals(AppStarter.OPERATEWEIBOUSER)){
+			//判断用户是存在，存在更新，否则新建
+			res.setContentType("text/plain;charset=UTF-8");
+			PrintWriter pw = res.getWriter();
+			String userId =req.getParameter("userId");
+			String accessToken = req.getParameter("accessToken");
+			String result = apiAdaptor.operateWeiboUser(userId,accessToken);
+			pw.print(result);
+			pw.close();
+			
+		}else if(action.equals(AppStarter.GETUSERINFO)){
+			//取用户信息
+			res.setContentType("text/plain;charset=UTF-8");
+			PrintWriter pw = res.getWriter();
+			String userId =req.getParameter("userId");
+			String result = apiAdaptor.getUserInfo(userId);
+			pw.print(result);
+			pw.close();
 			
 		}else if(action.equals(AppStarter.FORWARDTOWEIBO)){
+			//转发内容到微博
+			res.setContentType("text/plain;charset=UTF-8");
+			PrintWriter pw = res.getWriter();
+			String userId = req.getParameter("userId");
+			String animId = req.getParameter("animId");
+			String content = req.getParameter("content");
+			String result = apiAdaptor.forwardToWeibo(userId,animId,content);
+			pw.print(result);
+			pw.close();
 			
-		}else if(action.equals(AppStarter.IMPROVEWEIBOUSER)){
-			
+		}else if(action.equals(AppStarter.GETFRIENDBYPAGE)){
+			//取互粉的好友用户信息
+			res.setContentType("text/plain;charset=UTF-8");
+			PrintWriter pw = res.getWriter();
+			String userId =req.getParameter("userId");
+			String page = req.getParameter("page");
+			String result = apiAdaptor.getFriendByPage(userId,page);
+			pw.print(result);
+			pw.close();
+		
 		}
 		
 	}
@@ -236,7 +273,7 @@ public class AppStarter extends HttpServlet implements ApplicationListener,
 				}
 			}
 			
-//			//为flash增加843的socket端口 socketFlash.jar
+			//为flash增加843的socket端口 socketFlash.jar
 //			ServerFlex serverFlex = new ServerFlex();
 //			serverFlex.runServerFlex();
 
