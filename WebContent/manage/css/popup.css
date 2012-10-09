@@ -15,8 +15,8 @@
 	/* display:none;    */
 	position:fixed;   
 	_position:absolute;   
-	height:100px;   
-	width:300px;   
+	height:auto;   
+	width:360px;   
 	background:#FFFFFF;   
 	border:0px solid #c0c0c0;   
 	z-index:2;   
@@ -24,23 +24,11 @@
 	font-size:13px;   
 	box-shadow:3px 3px 3px #000;
 	border-radius: 5px;
+	text-align:left;
+	padding-left:10px;
+	padding-right:30px;
+	padding-bottom:20px;
 }
-
-#popupContact{   
-	/* display:none;    */
-	position:fixed;   
-	_position:absolute;   
-	height:200px;   
-	width:300px;   
-	background:#FFFFFF;   
-	border:0px solid #c0c0c0;   
-	z-index:2;   
-	padding:-3px,-1px,-1px,-1px;   
-	font-size:13px;   
-	box-shadow:3px 3px 3px #000;
-	border-radius: 5px;
-}
-
 
 #popupContact h2{   
 	text-align:left;   
@@ -48,7 +36,7 @@
 	font-size:20px;   
 	font-weight:700;   
 	border-bottom:1px dotted #D3D3D3;   
-	margin-left:8px;
+/* 	margin-left:8px; */
 }
 
 #popupContactClose{   
@@ -61,4 +49,8 @@
 	font-weight:700;   
 	display:block;   
 	cursor: pointer;
+}
+
+#submit{
+	margin-left:50px;
 }

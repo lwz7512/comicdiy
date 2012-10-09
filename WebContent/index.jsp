@@ -6,6 +6,6 @@
 <title>Home Page</title>
 </head>
 <body>
-	Hello everyone!
+	<% response.sendRedirect("animclient/Main.html"); %>
 </body>
 </html>

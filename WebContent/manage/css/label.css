@@ -1,5 +1,9 @@
-body {padding: 0; margin: 0;}
-body,html{height: 100%;}
+body{
+  font-family:Arial,Helvetica,sans-serif,"宋体";
+  font-size: 13px;
+  position: relative;
+  height: 100%;
+}
 
  #legend{
  	 text-align: center;
@@ -15,28 +19,77 @@ body,html{height: 100%;}
  }
  
 #content{
-	margin :0px 340px 300px 400px;
-     float: left;
+	margin :0px auto;
 	 height: auto;
-	 width: auto;
+	 width: 650px;
 	 /*border: 1px solid #FF0000;*/
 }
 
 #leftPanel{
 	 float: left;
-	 height: 400px;
+	 height: auto;
 	 width: 300px;
-	 border: 1px solid #00FF00;
+	 border: 1px solid #69c;
+/* 	 padding:12px; */
 }
 
 #rightPanel{
 	 float: right;
-	 height: 400px;
+	 height: auto;
 	 width: 300px;
-	 border: 1px solid #0000FF;
+	 border: 1px solid #69c;
+/* 	 margin-left: 350px; */
+/* 	 position:fixed; */
+/* 	 padding:12px; */
 }
 
-img{
-	vertical-align:bottom;
+
+#parentAdd{
+	padding:5px;
+	font-size: 15px;
+	font-weight: bold;
 }
+
+#childAdd{
+	padding:5px;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+#parentLabel img{
+	vertical-align:bottom;
+	float:right;
+}
+
+#childLabel img{
+	vertical-align:bottom;
+	float:right;
+}
+
+.odd {
+	background-color: #dbe8f0;
+	padding:6px;
+}
+
+.ldd {
+    background-color: #f5f5f5;
+    padding:6px;
+}
+
+.child{
+	  padding:3px;
+}
+
+span{
+	cursor:pointer;
+	text-decoration: none;
+}
+
+span:HOVER{
+	text-decoration: underline;
+}
+
+.extendCss { color:blue; }
+
+
 

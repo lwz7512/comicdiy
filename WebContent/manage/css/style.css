@@ -1,12 +1,10 @@
 body{
   font-family:Arial,Helvetica,sans-serif,"宋体";
-  font-size: 12px;
+  font-size: 13px;
   position: relative;
   height: 100%;
   text-align: center;
 }
-
-/* *{border:0px; margin:0px; padding:0px; text-align:center;} */
 
 table{
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
@@ -34,14 +32,6 @@ tbody tr:hover td{
 	background: #d0dafd;
 }
 
-input,textarea {
-	margin: 0;
-	padding: 0;
-	font-size: 12px;
-	font-family: Arial,Helvetica,sans-serif,"宋体";
-	outline: none;
-	color: #333;
-}
 a {
 	text-decoration: none;
 }
@@ -58,11 +48,46 @@ a: hover {
 	color: #390;
 }
 
+img{
+	vertical-align:middle;
+}
+
+ul {
+	list-style: none;
+}
+
+li {
+	display: list-item;
+	padding:6px;
+}
+
+#labelSpan{
+	vertical-align:middle;
+}
+
 #content {
+	width:480px;
+	border: 1px solid #69c;
+	margin: 20px auto;
 	text-align: left;
 }
 
-img{
-	vertical-align:bottom;
+.help-block {
+  margin-bottom: 0;
+  color: #999999;
 }
 
+input[type="file"] {
+	-webkit-box-align: baseline;
+	color: inherit;
+	text-align: start;
+	width:150px;
+}
+
+input#selfCategory{
+	 width: 100px;
+}
+
+input[type="text"] {
+	width:200px;
+}

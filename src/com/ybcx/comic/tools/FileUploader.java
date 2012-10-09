@@ -113,12 +113,14 @@ public class FileUploader extends HttpServlet {
 			String fileName = item.getName();
 			int dotPos = fileName.lastIndexOf(".");
 			//文件类型
-			String fileType = fileName.substring(dotPos+1);
+			String fileType = fileName.substring(dotPos+1).toLowerCase();
 			
-			if(fileType.equals("png") || fileType.equals("jpg") || fileType.equals("gif") || fileType.equals("swf")){
+			if(fileType.equals("png") || fileType.equals("jpg") || fileType.equals("jpeg") 
+					|| fileType.equals("gif") || fileType.equals("swf")){
 				log.debug(">>>The current file type is:"+fileType);
 			}else{
-				pw.print(">>> The current file is not a picture file, not to generate!");
+				// 返回客户端信息
+				pw.print("reject");
 				return;			
 			}
 
@@ -134,10 +136,18 @@ public class FileUploader extends HttpServlet {
 				log.debug("fileName is null ...");
 				return;
 			}
-
-			File uploadFile = new File(assetPath + File.separator + fileName);
-			// 生成文件
-			item.write(uploadFile);
+			
+			File uploadFile = null;
+			if(fileType.equals("swf")){
+				fileName = System.currentTimeMillis()+fileName.substring(dotPos).toLowerCase();
+				uploadFile = new File(assetPath + File.separator + fileName);
+				// 生成文件
+				item.write(uploadFile);
+			}else{
+				uploadFile = new File(assetPath + File.separator + fileName);
+				// 生成文件
+				item.write(uploadFile);
+			}
 		
 			
 			log.debug(fileName + " File is complete ...");
